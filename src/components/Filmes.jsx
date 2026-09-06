@@ -2,69 +2,25 @@ import { useState, useEffect, useCallback } from "react"
 
 import "../styles/filmes.css"
 
-import leSamourai from "../assets/poster le samourai.webp"
-import taxiDriver from "../assets/poster taxi driver.jpg"
-
-const Perfuracoes = ({ className = "" }) => (
-  <div className={`perfuracoes ${className}`} />
-)
-
-const Filmes = () => {
+const Filmes = ({
+  filmes,
+  watchlist,
+  setWatchlist,
+  abrirFilme,
+}) => {
   const [filmeSelecionado, setFilmeSelecionado] = useState(null)
-  const [modalVisivel, setModalVisivel] = useState(false)
 
-  const filmes = [
-    {
-      id: 1,
-      nome: "Le Samourai",
-      diretor: "Jean-Pierre Melville",
-      sinopse:
-        "Um assassino profissional extremamente metódico e solitário recebe a missão de matar um homem, mas acaba sendo envolvido em uma situação que ameaça expor sua identidade e sua forma de trabalhar.",
-      genero: "Noir",
-      data: "1967",
-      poster: leSamourai,
-      review: "...",
-    },
-    {
-      id: 2,
-      nome: "Taxi Driver",
-      diretor: "Martin Scorsese",
-      sinopse:
-        "Um veterano de guerra que trabalha como taxista em Nova York passa a enxergar a cidade como um lugar decadente e corrupto, ficando cada vez mais obcecado com a ideia de fazer algo a respeito.",
-      genero: "Drama / Neo-Noir",
-      data: "1976",
-      poster: taxiDriver,
-      review: "...",
-    },
-  ]
-
-  const abrirFilme = (filme) => {
-    setFilmeSelecionado(filme)
-
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => setModalVisivel(true))
-    )
+  const adicionarWatchlist = (id) => {
+    if (!watchlist.includes(id)) {
+      setWatchlist([...watchlist, id])
+    }
   }
 
-  const fecharModal = useCallback(() => {
-    setModalVisivel(false)
-    setTimeout(() => setFilmeSelecionado(null), 300)
-  }, [])
-
-  useEffect(() => {
-    if (!filmeSelecionado) return
-
-    const aoApertarTecla = (e) => {
-      if (e.key === "Escape") {
-        fecharModal()
-      }
-    }
-
-    window.addEventListener("keydown", aoApertarTecla)
-
-    return () =>
-      window.removeEventListener("keydown", aoApertarTecla)
-  }, [filmeSelecionado, fecharModal])
+  const removerWatchlist = (id) => {
+    setWatchlist(
+      watchlist.filter((filmeId) => filmeId !== id)
+    )
+  }
 
   return (
     <div className="filmes-container">
@@ -90,7 +46,7 @@ const Filmes = () => {
             onClick={() => abrirFilme(filme)}
             className="filme-card"
           >
-            <Perfuracoes />
+            <div className="perfuracoes" />
 
             <div className="relative aspect-[2/3] overflow-hidden">
 
@@ -110,7 +66,7 @@ const Filmes = () => {
 
             </div>
 
-            <Perfuracoes />
+            <div className="perfuracoes" />
 
             <div className="fonte-corpo p-4">
 
@@ -134,78 +90,28 @@ const Filmes = () => {
 
               </div>
 
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+
+                  if (watchlist.includes(filme.id)) {
+                    removerWatchlist(filme.id)
+                  } else {
+                    adicionarWatchlist(filme.id)
+                  }
+                }}
+                className="mt-4 w-full rounded-md bg-[#FF6F6F] px-4 py-2 font-semibold text-[#12080a] transition-all hover:bg-[#ff8585]"
+              >
+                {watchlist.includes(filme.id)
+                  ? "Remover da Watchlist"
+                  : "Assistir depois"}
+              </button>
+
             </div>
           </div>
         ))}
+
       </main>
-
-      {filmeSelecionado && (
-        <div
-          onClick={fecharModal}
-          className={`overlay-modal ${
-            modalVisivel ? "overlay-aberto" : "overlay-fechado"
-          }`}
-        >
-
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className={`filme-modal flex-col sm:flex-row ${
-              modalVisivel ? "modal-aberto" : "modal-fechado"
-            }`}
-          >
-
-            <button
-              onClick={fecharModal}
-              aria-label="Fechar"
-              className="botao-fechar"
-            >
-              ×
-            </button>
-
-            <img
-              src={filmeSelecionado.poster}
-              alt={filmeSelecionado.nome}
-              className="h-64 w-full object-cover sm:h-auto sm:w-48"
-            />
-
-            <div className="flex-1 p-6">
-
-              <h2 className="fonte-marquise text-3xl tracking-wide text-[#F5E8E4]">
-                {filmeSelecionado.nome}
-              </h2>
-
-              <p className="mt-1 text-sm text-[#C89A9C]">
-                {filmeSelecionado.diretor}
-              </p>
-
-              <div className="mt-3 flex items-center gap-2">
-
-                <span className="rounded-full border border-[#FF6F6F]/40 px-2 py-0.5 text-[11px] text-[#FF6F6F]">
-                  {filmeSelecionado.genero}
-                </span>
-
-                <span className="text-[11px] text-[#C89A9C]">
-                  {filmeSelecionado.data}
-                </span>
-
-              </div>
-
-              <div className="mt-4 h-px w-full bg-[#7A1620]/50" />
-
-              <p className="mt-4 text-sm leading-relaxed text-[#F5E8E4]/90">
-                {filmeSelecionado.sinopse}
-              </p>
-
-              {filmeSelecionado.review !== "..." && (
-                <p className="mt-4 text-sm italic text-[#C89A9C]">
-                  {filmeSelecionado.review}
-                </p>
-              )}
-
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
