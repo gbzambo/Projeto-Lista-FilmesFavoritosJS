@@ -14,6 +14,12 @@ const App = () => {
     return salva ? JSON.parse(salva) : []
   })
 
+  const [avaliacoes, setAvaliacoes] = useState(() => {
+    const salva = localStorage.getItem("filmes-avaliacoes")
+
+    return salva ? JSON.parse(salva) : {}
+  })
+
   const [filmeSelecionado, setFilmeSelecionado] = useState(null)
   const [modalVisivel, setModalVisivel] = useState(false)
   const [filmesComPoster, setFilmesComPoster] = useState(filmes)
@@ -26,14 +32,21 @@ const App = () => {
   }, [watchlist])
 
   useEffect(() => {
+    localStorage.setItem(
+      "filmes-avaliacoes",
+      JSON.stringify(avaliacoes)
+    )
+  }, [avaliacoes])
+
+  useEffect(() => {
     const carregarPosters = async () => {
       const filmesAtualizados = []
 
       for (const filme of filmes) {
-       const poster = await buscarFilme(
-    filme.tituloBusca || filme.nome,
-    filme.data
-    ) 
+        const poster = await buscarFilme(
+          filme.tituloBusca || filme.nome,
+          filme.data
+        )
 
         filmesAtualizados.push({
           ...filme,
@@ -64,6 +77,13 @@ const App = () => {
     setTimeout(() => {
       setFilmeSelecionado(null)
     }, 300)
+  }
+
+  const avaliarFilme = (id, nota) => {
+    setAvaliacoes({
+      ...avaliacoes,
+      [id]: nota,
+    })
   }
 
   return (
@@ -127,7 +147,6 @@ const App = () => {
                 : "modal-fechado"
             }`}
           >
-
             <button
               onClick={fecharModal}
               aria-label="Fechar"
@@ -184,12 +203,49 @@ const App = () => {
                 </p>
               )}
 
-            </div>
+              <div className="mt-6">
 
+                <p className="fonte-corpo mb-2 text-xs uppercase tracking-wider text-[#C89A9C]">
+                  Minha avaliação
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+                    (nota) => (
+                      <button
+                        key={nota}
+                        onClick={() =>
+                          avaliarFilme(
+                            filmeSelecionado.id,
+                            nota
+                          )
+                        }
+                        className={`h-9 w-9 rounded-md border text-sm font-semibold transition-all ${
+                          avaliacoes[filmeSelecionado.id] === nota
+                            ? "border-[#FF6F6F] bg-[#FF6F6F] text-[#12080a]"
+                            : "border-[#7A1620] bg-[#1A0A0D] text-[#C89A9C] hover:border-[#FF6F6F] hover:text-[#FF6F6F]"
+                        }`}
+                      >
+                        {nota}
+                      </button>
+                    )
+                  )}
+
+                </div>
+
+                {avaliacoes[filmeSelecionado.id] !== undefined && (
+                  <p className="fonte-corpo mt-3 text-sm text-[#FF6F6F]">
+                    Nota: {avaliacoes[filmeSelecionado.id]}/10
+                  </p>
+                )}
+
+              </div>
+
+            </div>
           </div>
         </div>
       )}
-
     </div>
   )
 }
