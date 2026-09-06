@@ -32,7 +32,7 @@
   left: 50%;
   top: 0;
   width: 900px;
-  height: 420px;
+  height: 500px;
   transform: translateX(-50%);
   opacity: 0.4;
   filter: blur(48px);
@@ -42,6 +42,67 @@
     transparent 70%
   );
 }
+
+/* FOTO DO TOPO */
+
+.foto-perfil {
+  position: relative;
+  width: 145px;
+  height: 190px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 111, 111, 0.65);
+  border-radius: 2px;
+  background: #12080A;
+  box-shadow:
+    0 0 35px rgba(255, 111, 111, 0.18),
+    0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+.foto-perfil::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.05),
+      rgba(0, 0, 0, 0.2)
+    ),
+    linear-gradient(
+      to top,
+      rgba(11, 6, 7, 0.45),
+      transparent 45%
+    );
+}
+
+.foto-perfil::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.foto-perfil img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: grayscale(20%) contrast(1.05) brightness(0.9);
+  transition: all 0.5s ease;
+}
+
+.foto-perfil:hover img {
+  transform: scale(1.04);
+  filter: grayscale(5%) contrast(1.08) brightness(0.95);
+}
+
+/* CARDS */
 
 .filme-card {
   position: relative;
@@ -98,6 +159,8 @@
   background-position: center;
   background-repeat: repeat-x;
 }
+
+/* MODAL */
 
 .filme-modal {
   position: relative;
