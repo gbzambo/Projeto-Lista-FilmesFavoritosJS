@@ -103,3 +103,4 @@ const Watchlist = ({ watchlist, filmes, abrirFilme }) => {
   )
 }
 
+export default Watchlist

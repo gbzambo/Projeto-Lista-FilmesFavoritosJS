@@ -1,13 +1,37 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import Filmes from "./components/Filmes"
 import Watchlist from "./components/Watchlist"
 import filmes from "./data/filmes"
+import buscarFilme from "./services/tmdb"
 
 const App = () => {
   const [watchlist, setWatchlist] = useState([])
   const [filmeSelecionado, setFilmeSelecionado] = useState(null)
   const [modalVisivel, setModalVisivel] = useState(false)
+  const [filmesComPoster, setFilmesComPoster] = useState(filmes)
+
+  useEffect(() => {
+    const carregarPosters = async () => {
+      const filmesAtualizados = []
+
+      for (const filme of filmes) {
+        const poster = await buscarFilme(
+          filme.nome,
+          filme.data
+        )
+
+        filmesAtualizados.push({
+          ...filme,
+          poster,
+        })
+
+        setFilmesComPoster([...filmesAtualizados, ...filmes.slice(filmesAtualizados.length)])
+      }
+    }
+
+    carregarPosters()
+  }, [])
 
   const abrirFilme = (filme) => {
     setFilmeSelecionado(filme)
@@ -28,14 +52,14 @@ const App = () => {
   return (
     <div>
       <Filmes
-        filmes={filmes}
+        filmes={filmesComPoster}
         watchlist={watchlist}
         setWatchlist={setWatchlist}
         abrirFilme={abrirFilme}
       />
 
       <Watchlist
-        filmes={filmes}
+        filmes={filmesComPoster}
         watchlist={watchlist}
         abrirFilme={abrirFilme}
       />
@@ -65,11 +89,19 @@ const App = () => {
               ×
             </button>
 
-            <img
-              src={filmeSelecionado.poster}
-              alt={filmeSelecionado.nome}
-              className="h-64 w-full object-cover sm:h-auto sm:w-48"
-            />
+            {filmeSelecionado.poster ? (
+              <img
+                src={filmeSelecionado.poster}
+                alt={filmeSelecionado.nome}
+                className="h-64 w-full object-cover sm:h-auto sm:w-48"
+              />
+            ) : (
+              <div className="flex h-64 w-full items-center justify-center bg-[#1A0A0D] sm:h-auto sm:w-48">
+                <span className="fonte-marquise px-4 text-center text-2xl text-[#7A3A40]">
+                  {filmeSelecionado.nome}
+                </span>
+              </div>
+            )}
 
             <div className="flex-1 p-6">
               <h2 className="fonte-marquise text-3xl tracking-wide text-[#F5E8E4]">
